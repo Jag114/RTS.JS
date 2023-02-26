@@ -7,7 +7,7 @@ export type { Cell }
 type Cell = { 
   x:number, y:number, width:number, height:number, terrain:string
 }
-
+//odd numbers so there is central cell
 const COL_NUMBER = 161;
 const ROW_NUMBER = 81;
 let scale = 1;
@@ -58,8 +58,7 @@ function Map() {
       }, [])   
       console.log("Draw time: " + (Date.now() - start) / 1000 + " sec.");
     }
-  })
-  console.log(map);
+  }, [draw])
   
   // needs an algorithm to create new array of cells that are visible after resizing
   const changeScale = (value:string, scaleValue:number, ctx:CanvasRenderingContext2D | null | undefined) :void => {
@@ -88,8 +87,30 @@ function Map() {
 
   const remakeMap = (): void => {
     localStorage.setItem("myMap", JSON.stringify([]))
-    setRemake(prevRemake => !prevRemake)
+    setMap([...makeMap(ROW_NUMBER, COL_NUMBER)])
   }
+
+  //base zooming around central cell
+  const getCentralCell = (map:Cell[][], scale:number):Cell => {
+    console.log("Scale: ", scale)
+    const cellsInRow = Math.floor((COL_NUMBER / (1 * scale)));
+    console.log("Cells in row: ", cellsInRow)
+    const cellsInColumn = Math.floor((ROW_NUMBER / (1 * scale)));
+    console.log("Cells in rocolw: ", cellsInColumn)
+    const yCoord = Math.ceil(cellsInRow / 2);
+    console.log("Y: ", yCoord);
+    const xCoord = Math.ceil(cellsInColumn / 2);
+    console.log("X: ", xCoord)
+    const centralCell:Cell = map[xCoord][yCoord];
+    console.log("Central cell: ", centralCell)
+    centralCell.terrain = "red";
+    return centralCell;
+  }
+
+  useEffect(() => {
+    getCentralCell(map, scale)
+  }, [scale])
+  
   
   return (
     <div className="map-holder">
