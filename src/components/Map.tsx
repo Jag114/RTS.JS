@@ -8,8 +8,8 @@ type Cell = {
   x:number, y:number, width:number, height:number, terrain:string
 }
 //odd numbers so there is central cell
-const COL_NUMBER = 161;
-const ROW_NUMBER = 81;
+const COL_NUMBER = 160;
+const ROW_NUMBER = 80;
 let scale = 1;
 
 function Map() {
@@ -85,22 +85,28 @@ function Map() {
     }
   }
 
-  const remakeMap = (): void => {
+  const remakeMap = (ctx:CanvasRenderingContext2D | null | undefined): void => {
     localStorage.setItem("myMap", JSON.stringify([]))
+    ctx?.clearRect(0, 0, 1920, 1080)
     setMap([...makeMap(ROW_NUMBER, COL_NUMBER)])
   }
 
   //base zooming around central cell
-  const getCentralCell = (map:Cell[][], scale:number):Cell => {
+  const getCentralCell = (map:Cell[][], scale:number):Cell | void => {
+    console.log(map)
     console.log("Scale: ", scale)
-    const cellsInRow = Math.floor((COL_NUMBER / (1 * scale)));
-    console.log("Cells in row: ", cellsInRow)
-    const cellsInColumn = Math.floor((ROW_NUMBER / (1 * scale)));
-    console.log("Cells in rocolw: ", cellsInColumn)
-    const yCoord = Math.ceil(cellsInRow / 2);
-    console.log("Y: ", yCoord);
-    const xCoord = Math.ceil(cellsInColumn / 2);
-    console.log("X: ", xCoord)
+    const cellsInRow = Math.floor((COL_NUMBER / scale));
+    console.log("Cells in row (drawn columns): ", cellsInRow)
+    const cellsInColumn = Math.floor((ROW_NUMBER / scale));
+    console.log("Cells in col (drawn rows): ", cellsInColumn)
+    const xCoord = Math.ceil(cellsInColumn / 2) - 1;
+    console.log("X: ", xCoord);
+    const yCoord = Math.ceil(cellsInRow / 2) - 1;
+    console.log("Y: ", yCoord)
+    if(map[xCoord] === undefined || map[xCoord][yCoord] === undefined){
+      window.alert("Error, out of scope array operation")
+      return;
+    }
     const centralCell:Cell = map[xCoord][yCoord];
     console.log("Central cell: ", centralCell)
     centralCell.terrain = "red";
@@ -119,7 +125,7 @@ function Map() {
         <button className="map-zoom-plus" onClick={() => changeScale("+", scale, getContext(canvasRef.current))}> + </button>
         <button className="map-zoom-minus" onClick={() => changeScale("-", scale, getContext(canvasRef.current))}> - </button>
       </div>
-      <button className="map-button" onClick={() => remakeMap()}> New map </button>
+      <button className="map-button" onClick={() => remakeMap(getContext(canvasRef.current))}> New map </button>
       <button className="map-button" onClick={() => localStorage.setItem("myMap", JSON.stringify([]))}> Reset saved map</button>
       <canvas className="map-canvas" height="800px" width="1600px" ref={canvasRef}/>
     </div> 
