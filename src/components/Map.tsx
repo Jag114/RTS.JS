@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import "./Map.css";
+import "../styles/Map.css";
 import useMapState from "../hooks/useMapState";
 import makeMap from "../data/makeMap";
+import InterfaceCell from "./InterfaceCell"
 export type { Cell }
 
 type Cell = { 
-  x:number, y:number, width:number, height:number, terrain:string
+  x:number, y:number, width:number, height:number, terrain:string, ID:string
 }
 //odd numbers so there is central cell
 const COL_NUMBER = 160;
@@ -33,7 +34,7 @@ function Map() {
   };
 
   const [ remake, setRemake ] = useState(false); //for forcing rerenders
-  const worldMap = [{...map}]; //constant data for world
+  const worldMap:Cell [][] = map //constant data for world
   //randomized colors
   function draw(ctx:CanvasRenderingContext2D | undefined, cell:Cell, i:number, j:number){
     const { width, height, terrain } = cell;
@@ -44,6 +45,22 @@ function Map() {
       ctx.fillRect(i * 10 * scale, j * 10 * scale, width * scale, height * scale);
       ctx.closePath();
     }
+  }
+  
+  const drawInterface = () => {
+    const interfaceMapArray:JSX.Element[] = [];
+    worldMap.forEach(e => {
+      e.forEach((cell:Cell) => {
+        const propsObj:object = {
+          cellData: {...cell},
+          scale: scale
+        }
+        interfaceMapArray.push(<InterfaceCell {...propsObj} key={cell.ID}/>)
+      })
+    })
+    console.log(interfaceMapArray);
+    
+    return interfaceMapArray;
   }
 
   useEffect(() => {   
@@ -127,6 +144,9 @@ function Map() {
       </div>
       <button className="map-button" onClick={() => remakeMap(getContext(canvasRef.current))}> New map </button>
       <button className="map-button" onClick={() => localStorage.setItem("myMap", JSON.stringify([]))}> Reset saved map</button>
+      <div className="map-interface" style={{height: "800px", width: "1600px"}}>
+        {drawInterface()}
+      </div>
       <canvas className="map-canvas" height="800px" width="1600px" ref={canvasRef}/>
     </div> 
   )

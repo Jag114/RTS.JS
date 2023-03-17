@@ -1,4 +1,5 @@
 import type { Cell } from "../components/Map";
+import { v4 as uudiv4 } from 'uuid';
 
 function makeMap(row:number, col:number){
   const colors = ["green", "blue", "grey", "yellow"];
@@ -10,7 +11,8 @@ function makeMap(row:number, col:number){
         y: j,
         width: 10,
         height: 10,
-        terrain: colors[Math.floor(Math.random() * colors.length)]
+        terrain: colors[Math.floor(Math.random() * colors.length)],
+        ID: uudiv4()
       };
       mapCellsRows[i][j] = cell;
     }
