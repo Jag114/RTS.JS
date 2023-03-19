@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import "../styles/Map.css";
-import useMapState from "../hooks/useMapState";
 import makeMap from "../data/makeMap";
-import InterfaceCell from "./InterfaceCell"
+import InterfaceTable from "./InterfaceTable"
 export type { Cell }
 
 type Cell = { 
@@ -45,22 +44,6 @@ function Map() {
       ctx.fillRect(i * 10 * scale, j * 10 * scale, width * scale, height * scale);
       ctx.closePath();
     }
-  }
-  
-  const drawInterface = () => {
-    const interfaceMapArray:JSX.Element[] = [];
-    worldMap.forEach(e => {
-      e.forEach((cell:Cell) => {
-        const propsObj:object = {
-          cellData: {...cell},
-          scale: scale
-        }
-        interfaceMapArray.push(<InterfaceCell {...propsObj} key={cell.ID}/>)
-      })
-    })
-    console.log(interfaceMapArray);
-    
-    return interfaceMapArray;
   }
 
   useEffect(() => {   
@@ -145,7 +128,7 @@ function Map() {
       <button className="map-button" onClick={() => remakeMap(getContext(canvasRef.current))}> New map </button>
       <button className="map-button" onClick={() => localStorage.setItem("myMap", JSON.stringify([]))}> Reset saved map</button>
       <div className="map-interface" style={{height: "800px", width: "1600px"}}>
-        {drawInterface()}
+        <InterfaceTable {...{data: map, scale: scale}}/>
       </div>
       <canvas className="map-canvas" height="800px" width="1600px" ref={canvasRef}/>
     </div> 

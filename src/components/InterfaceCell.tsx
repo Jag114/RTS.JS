@@ -1,21 +1,35 @@
 import React from "react";
-import "../styles/Map.css"
-import { Cell } from "./Map";
+import "../styles/Map.css";
 
-let a = 1;
-
-function InterfaceCell(props:any) {
+function InterfaceCell(props: any) {
   const { terrain, width, height } = props.cellData;
   const scale = props.scale;
-  const style = {width: `${width*scale}px`, height: `${height*scale}px`}
-  a < 10 && console.log("Props: ", props,"Scale: ", scale,"Style: ", style);
-  a++;
-  const handleClick = () => {
-    console.log(terrain, scale, style);
-  }
+  const style = { width: `${width * scale}px`, height: `${height * scale}px` };
 
-  return ( 
-    <div className="map-interface-cell" onClick={() => handleClick()} style={style}></div>
+  const handleClick = (e:React.MouseEvent, message:string) => {
+    console.log(terrain, scale, style);
+
+    const popup = document.createElement("div");
+    popup.classList.add("map-interface-cell-popup");
+    popup.textContent = message;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    popup.style.left = `${rect.left + window.pageXOffset + 8}px`;
+    popup.style.top = `${rect.top + window.pageYOffset + 8}px`;
+
+    document.body.appendChild(popup);
+
+    setTimeout(() => {
+      document.body.removeChild(popup);
+    }, 3000);
+  };
+
+  return (
+    <td
+      className="map-interface-cell"
+      onClick={(e) => handleClick(e, terrain)}
+      style={style}
+    ></td>
   );
 }
 

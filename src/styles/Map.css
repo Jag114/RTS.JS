@@ -32,3 +32,22 @@
 .map-interface-cell{
   background-color: rgba(0, 0, 0, .5);
 }
+
+.map-interface-cell-popup{
+  position: absolute;
+  outline: 1px solid blue;
+  width: 2.5rem;
+  height: 1.5rem;
+  background-color: rgba(255, 255, 255, .5);
+}
+
+table, tbody, tr, td{
+  padding: 0;
+  margin: 0;
+  border-collapse: collapse;
+}
+
+td{
+  outline: 0.1px solid purple
+}
+
