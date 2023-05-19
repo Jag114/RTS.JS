@@ -7,10 +7,10 @@ export type { Cell }
 type Cell = { 
   x:number, y:number, width:number, height:number, terrain:string, ID:string
 }
-//odd numbers so there is central cell
+//odd numbers so there is central cell (not needed?)
 const COL_NUMBER = 160;
 const ROW_NUMBER = 80;
-let scale = 1;
+
 
 function Map() {
   const [map, setMap] = useState(() => {
@@ -31,12 +31,21 @@ function Map() {
   const getContext = (canvas: HTMLCanvasElement | null): CanvasRenderingContext2D | null => {
     return canvas?.getContext('2d') ?? null;
   };
-
+  
+  const [scaleExponent, setScaleExponent] = useState(0);
+  const scale = Math.pow(2, scaleExponent);
+  console.log("Scale: ", scale,"Scale exponent: ", scaleExponent);
+  console.log("AAAAAAAAAAAAAAAAAAAAA");
+  
+  
   const [ remake, setRemake ] = useState(false); //for forcing rerenders
   const worldMap:Cell [][] = map //constant data for world
   //randomized colors
+  //add starting(UP, LEFT) and ending (DOWN, RIGHT) cell 
+  //REWRITE IT TO CUSTOM COMPONENT (DIV RO STH)?
   function draw(ctx:CanvasRenderingContext2D | undefined, cell:Cell, i:number, j:number){
     const { width, height, terrain } = cell;
+
     if(ctx !== undefined){
       ctx.beginPath()
       //add perlin noise or weights to certain colours aka terrains
@@ -49,40 +58,47 @@ function Map() {
   useEffect(() => {   
     const canvas = canvasRef.current;
     const context = getContext(canvas);
+    const endCol = Math.floor((COL_NUMBER / scale));
+    const endRow = Math.floor((ROW_NUMBER / scale));
+    console.log(endCol, endRow);
+    
     if(context !== null){
       const start = Date.now();
       map.forEach((col:Cell[], j:number) => {
-        col.forEach((cell:Cell, i:number) => {
-          draw(context, cell, i, j);
-        });
-      }, [])   
-      console.log("Draw time: " + (Date.now() - start) / 1000 + " sec.");
+        if(j < endRow){
+          col.forEach((cell:Cell, i:number) => {
+            if(i < endCol){
+              draw(context, cell, i, j);
+            }
+          });
+        }
+      })   
+      //console.log("Draw time: " + (Date.now() - start) / 1000 + " sec.");
     }
-  }, [draw])
+  }, [draw, scaleExponent])
   
   // needs an algorithm to create new array of cells that are visible after resizing
-  const changeScale = (value:string, scaleValue:number, ctx:CanvasRenderingContext2D | null | undefined) :void => {
-    let newScale = scaleValue;
+  const changeScale = (value:string, scaleExponentValue:number, ctx:CanvasRenderingContext2D | null | undefined) :void => {
+    let newScaleExponentValue = scaleExponentValue; 
     switch (value) {
       case "+":
-        if(newScale < 100){
-          newScale++;
+        if(newScaleExponentValue < 4){   
+          newScaleExponentValue++;
         }
         break;
       case "-":
-        if(newScale > 1){
-          newScale--;
+        if(newScaleExponentValue > 0){
+          newScaleExponentValue--;
         }
         break;
       default:
         break;
     }
 
-    if(scale !== newScale){
-      scale = newScale;
+    if(newScaleExponentValue !== scaleExponent){
       ctx?.clearRect(0, 0, 1600, 800);
-      setRemake(prevRemake => !prevRemake);
-    }
+      setScaleExponent(newScaleExponentValue);
+    } 
   }
 
   const remakeMap = (ctx:CanvasRenderingContext2D | null | undefined): void => {
@@ -93,22 +109,22 @@ function Map() {
 
   //base zooming around central cell
   const getCentralCell = (map:Cell[][], scale:number):Cell | void => {
-    console.log(map)
-    console.log("Scale: ", scale)
+    //console.log(map)
+    //console.log("Scale: ", scale)
     const cellsInRow = Math.floor((COL_NUMBER / scale));
-    console.log("Cells in row (drawn columns): ", cellsInRow)
+    //console.log("Cells in row (drawn columns): ", cellsInRow)
     const cellsInColumn = Math.floor((ROW_NUMBER / scale));
-    console.log("Cells in col (drawn rows): ", cellsInColumn)
+    //console.log("Cells in col (drawn rows): ", cellsInColumn)
     const xCoord = Math.ceil(cellsInColumn / 2) - 1;
-    console.log("X: ", xCoord);
+    //console.log("X: ", xCoord);
     const yCoord = Math.ceil(cellsInRow / 2) - 1;
-    console.log("Y: ", yCoord)
+    //console.log("Y: ", yCoord)
     if(map[xCoord] === undefined || map[xCoord][yCoord] === undefined){
       window.alert("Error, out of scope array operation")
       return;
     }
     const centralCell:Cell = map[xCoord][yCoord];
-    console.log("Central cell: ", centralCell)
+    //console.log("Central cell: ", centralCell)
     centralCell.terrain = "red";
     return centralCell;
   }
@@ -116,19 +132,20 @@ function Map() {
   useEffect(() => {
     getCentralCell(map, scale)
   }, [scale])
-  
-  
+
   return (
     <div className="map-holder">
       <div className="map-zoom">
         <span> Zoom in/out </span>
-        <button className="map-zoom-plus" onClick={() => changeScale("+", scale, getContext(canvasRef.current))}> + </button>
-        <button className="map-zoom-minus" onClick={() => changeScale("-", scale, getContext(canvasRef.current))}> - </button>
+        <button className="map-zoom-plus" onClick={() => changeScale("+", scaleExponent, getContext(canvasRef.current))}> + </button>
+        <button className="map-zoom-minus" onClick={() => changeScale("-", scaleExponent, getContext(canvasRef.current))}> - </button>
       </div>
       <button className="map-button" onClick={() => remakeMap(getContext(canvasRef.current))}> New map </button>
       <button className="map-button" onClick={() => localStorage.setItem("myMap", JSON.stringify([]))}> Reset saved map</button>
+      {/* map size based on users device} */}
       <div className="map-interface" style={{height: "800px", width: "1600px"}}>
-        <InterfaceTable {...{data: map, scale: scale}}/>
+        {/* there should be the same amount of interface cells as map cells */}
+        <InterfaceTable {...{map: map, data: {endRow: (ROW_NUMBER / scale), endCol: (COL_NUMBER / scale)}, scale: scale}}/>
       </div>
       <canvas className="map-canvas" height="800px" width="1600px" ref={canvasRef}/>
     </div> 

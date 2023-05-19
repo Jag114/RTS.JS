@@ -2,12 +2,12 @@ import React from "react";
 import "../styles/Map.css";
 
 function InterfaceCell(props: any) {
-  const { terrain, width, height } = props.cellData;
+  const { x, y, terrain, width, height } = props.cellData;
   const scale = props.scale;
   const style = { width: `${width * scale}px`, height: `${height * scale}px` };
 
   const handleClick = (e:React.MouseEvent, message:string) => {
-    console.log(terrain, scale, style);
+    console.log(x, y, terrain, scale, style);
 
     const popup = document.createElement("div");
     popup.classList.add("map-interface-cell-popup");

@@ -4,22 +4,28 @@ import { Cell } from "./Map";
 import { v4 as uudiv4} from 'uuid'
 
 interface Props {
-  data: Cell[][],
+  map: Cell[][],
+  data: {endCol:number, endRow:number},
   scale: number;
 }
 
 // scale should change amount of cells
-const InteraceTable = ({ data, scale }: Props) => {
+const InteraceTable = ({ map, data, scale }: Props) => {
+
+
   return (
     <table>
       <tbody>
-        {data.map((row, rowIndex) => (
+        {map.map((row, rowIndex) => (
+          rowIndex < data.endRow &&
           <tr key={rowIndex}>
             {row.map((cell) => (
+              cell.y < data.endCol &&
               <InterfaceCell scale={scale} cellData={cell} key={uudiv4()} />
             ))}
           </tr>
         ))}
+
       </tbody>
     </table>
   );
