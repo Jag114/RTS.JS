@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import "../styles/Map.css";
 import makeMap from "../data/makeMap";
-import InterfaceTable from "./InterfaceTable"
+import WorldMap from "./WorldMap"
 export type { Cell }
 
 type Cell = { 
@@ -142,12 +142,7 @@ function Map() {
       </div>
       <button className="map-button" onClick={() => remakeMap(getContext(canvasRef.current))}> New map </button>
       <button className="map-button" onClick={() => localStorage.setItem("myMap", JSON.stringify([]))}> Reset saved map</button>
-      {/* map size based on users device} */}
-      <div className="map-interface" style={{height: "800px", width: "1600px"}}>
-        {/* there should be the same amount of interface cells as map cells */}
-        <InterfaceTable {...{map: map, data: {endRow: (ROW_NUMBER / scale), endCol: (COL_NUMBER / scale)}, scale: scale}}/>
-      </div>
-      <canvas className="map-canvas" height="800px" width="1600px" ref={canvasRef}/>
+        <WorldMap/>
     </div> 
   )
 }
