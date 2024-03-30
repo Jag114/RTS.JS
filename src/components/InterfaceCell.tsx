@@ -14,8 +14,8 @@ function InterfaceCell(props: any) {
     popup.textContent = message;
 
     const rect = e.currentTarget.getBoundingClientRect();
-    popup.style.left = `${rect.left + window.pageXOffset + 8}px`;
-    popup.style.top = `${rect.top + window.pageYOffset + 8}px`;
+    popup.style.left = `${rect.left + window.scrollX + 8}px`;
+    popup.style.top = `${rect.top + window.scrollY + 8}px`;
 
     document.body.appendChild(popup);
 

@@ -12,7 +12,6 @@ interface Props {
 // scale should change amount of cells
 const InteraceTable = ({ map, data, scale }: Props) => {
 
-
   return (
     <table>
       <tbody>
